@@ -116,7 +116,7 @@ if strcmp(wSim.Con.name, 'Matsuoka')
         [TTemp,XTemp] = ode45(@MatsDerivative,t_span,IC0,options);
         
         % use Rescaling to change the gene:
-        thisSeq = GA.rescaleFcn(GA.Gen, thisSeq, XTemp, TTemp);
+        thisSeq = GA.rescaleFcn(GA.Gen, thisSeq, XTemp, TTemp, wSim.Con.des_period);
         wSim = GA.Gen.Decode(wSim,thisSeq);
         wSim.Con = wSim.Con.HandleEvent(1, wSim.IC(wSim.ConCo));
         wSim.Con = wSim.Con.Adaptation();
@@ -125,6 +125,7 @@ if strcmp(wSim.Con.name, 'Matsuoka')
     % % Check the generated ankle torque of the genome:
     if ~isempty(GA.genomeChevkFcn) && strcmp(wSim.Con.name, 'Matsuoka')
         noGO_flag = GA.genomeChevkFcn(XTemp, TTemp);
+        error('you are not suppose to use this function!');
         % If noGO flag is true, than don't evaluate the fitness (keep them
         % zero). warning, this might cause an issue with minimizing
         % fitness!
@@ -144,7 +145,8 @@ if strcmp(wSim.Con.name, 'Matsuoka')
 end
 
     function xdot = MatsDerivative(t,x)
-        xdot = wSim.Con.Derivative(t,x);
+        % when running the CPG without the CB, give zeros as the CB state.
+        xdot = wSim.Con.Derivative(t,[0;0],x);
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%   

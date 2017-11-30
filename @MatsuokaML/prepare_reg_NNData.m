@@ -13,7 +13,7 @@ function [ samples, targets, normParams ] = ...
     switch CPG_Type
         case '2N_CPG'
             new_periods = horzcat(data.results(:).periods);
-            new_periods = new_periods(2,:); % take only hip periods
+            new_periods = new_periods(3,:); % take only hip periods
             osc_ids = ~isnan(new_periods);
 
             good_ids = osc_ids;

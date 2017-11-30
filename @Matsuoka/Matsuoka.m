@@ -43,49 +43,57 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
     properties
         name = 'Matsuoka'
         
-%         Parameters for 4 nueons CPG
+        % % % Participating joints:
+        % what neurons we are using?
+        % ACT_Neurons = [ankle1, ankle2, hip];
+        ACT_Neurons = [false,false,true];
+        % ankleSelect = [ankle1, ankle2, hip];
+        ankleSelect = [true,false,true];
+        % 'ACT_Neurons' - is not chaning in the simulation and is used in
+        % the MatsuokaML class
+        % 'ankleSelect' - is changing to switch the right neuron pair to
+        % the stance ankle.
+        
+%         Parameters for the CPG
         tau0 = 1; tau = 1;
         tav0 = 1; tav = 1;
-        tau_ratio = 12;  %5;
+        tau_ratio = 12; 
         beta = 0.1;
         u0 = 1;
-        win = [];%[0, 3; 1, 0];
+        win = [];
         wex = [];
         W = [];
      
         stDim = 4; % state dimension
         nEvents = 1; % num. of simulation events
         
+		% CPG feedback parameters:
+		k_hip_fb = 0;
+        legSwitch = 1; % switch the feedbcak sign when the legs are switching
+		
+		% Slope feedback parametrs
+		FBType = 0;  % 0 - no slope feedback
+		
         % Controller Output
-        startup_t = 0;
-        nPulses = 1;
+        startup_t = 0; % torque start time. give the CPG time to converge 
+        nPulses = 1; % number of flexor/extensor pairs which actuate the joint
+        njoints = 1; % number of actuated joints in the CB
         OutM = [0, 0; 1 -0.1];
-        Amp0 = 1.5;%10
-        Amp = 1.5;%10
+        Amp0 = 1.5;
+        Amp = 1.5;
         ExtPulses = [];
-        
-        % For case with two distinct ankle joints
-        % every step a different pair of CPG neurons is chosen to actuate
-        % the ankle.
-        jointSelM = 1; %diag([1,1,0,0,1,1]);
-        
-        % if 'ture' then use 6neurons and actuate different ankles
-        %   if 'false then only actuate 'hip'
-        twoAnkleFlag = 0;
-        
         
         % Saturation
         MinSat; MaxSat;
         
-        % Feedback
-        FBType = 0;  % 0 - no feedback
-        
+        % Higher level speed command parameters
         s_in = 0;    % Speed input - higher level input to control the
                      % desired walking speed
+        ks_tau = 0;	% gain on tau
+        ks_out = 0; % gain on the tonics inputs
         
-        % Gains
-        ks_tau = 0;
-        ks_out = 0;
+        % parameters for MOGA use:
+        des_period = 1.4; % desired period for rescaling method.
         
         % Phase reset
         ExtP_reset = []; % set to a certain phase to use phase reset
@@ -96,66 +104,45 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
             'tau', 'tau_u', 'tav', 'tau_v', 'tau_r', '\tau_r', ...
             'tau_ratio', '\tau_ratio', ...
             'beta', 'win', 'wex', 'weights', 'amp0', 'amp', ...
-            'fbtype', 'feedback', 'fb', ...
             'ks_tau', 'speed_tau', 'tau_speed_gain', 'ks_\tau', ...
             'ks_out', 'speed_out', 'torque_speed_gain', 'ks_c',...
             '2neuron_symm_weights','2neuron_general_weights',...
             'amp_2n_dif_inputs','amp_2n_same_inputs','ks_c_2n_symm','ks_c_2n_general',...
-            '4neuron_symm_weights','amp_4n_symm','4neuron_taga_like','ks_c_4n_symm',...
-            'amp_same4each_joint','ks_c_same4each_joint',...
             'amp_6n_symm','6neuron_taga_like',...
-            '6neuron_taga_like_symm'};
+            '6neuron_taga_like_symm','k_hip_fb','des_period'};
     end
     
     methods
         % %%%%%% % Class constructor % %%%%%% %
         function [MO] = Matsuoka(varargin)
             
-%             MO.nEvents = ;
         end
         
         function MO = Reset(MO,Phase)
-            
+            % called when perf phase reset (not in use right now)
         end
         
         function MO = SetOutMatrix(MO, ppj)
             % ppj - Pulses per joint
             % Provided as, [# of E/F neuron pairs for joint 1, ...
             %               # of E/F neuron pairs for joint 2, ... ]
-            n_joints = length(ppj);
+            MO.njoints = length(ppj);
             MO.nPulses = sum(ppj);
-            MO.OutM = zeros(n_joints, 2*MO.nPulses);
+            MO.OutM = zeros(MO.njoints, 2*MO.nPulses);
             p = 1;
-            for j = 1:n_joints
+            for j = 1:MO.njoints
                 MO.OutM(j, p:p + 2*ppj(j) - 1) = ...
                     repmat([1, -1], 1, ppj(j));
                 p = p + 2*ppj(j);
             end
         end 
         
-        function MO = SetAnkles_selection(MO, ankleNum)
-            % If we use two ankles the set 'jointSelM' that every step is
-            % chaging via event to be either:
-            %   diag([1,1,0,0,1,1]) - when the left leg is stance
-            % or,
-            %   diag([0,0,1,1,1,1]) - when the right leg is stance
-            if ankleNum == 2
-                MO.jointSelM = diag([1,1,0,0,1,1]);
-                MO.twoAnkleFlag = 1;
-            elseif ankleNum == 1
-                MO.jointSelM = 1;
-                MO.twoAnkleFlag = 0;
-            end
-        end 
-        
         function [Torques] = Output(MO, t, MOX, ~)
             y = max(MOX(1:2*MO.nPulses,:),0);
-%             y = diag(MO.Amp)*max(MOX(1:2*MO.nPulses,:),0);
             try
-%                 Torques = MO.OutM*y;
-                Torques = MO.OutM*MO.jointSelM*y;
+                Torques = MO.OutM(MO.ankleSelect,:)*y;
             catch
-                disp('unable to calculate torques')
+                warning('unable to calculate torques')
             end
 
             % Apply saturation
@@ -170,7 +157,9 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
         end
 
         function [per] = GetPeriod(MO)
-            per = 0.754;
+            % TODO: calculate the period before running the simulation with
+            % the robot.
+			per=1.4; % per = 0.754;
 %             per = (MO.P_th-MO.P_reset)/MO.omega;
         end
         
@@ -188,6 +177,7 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
         end
         
         function [MO] = Adaptation(MO, ~)
+			% % % slope adaptaion:
             if MO.FBType == 0
                 % NO FEEDBACK
 %                 MO.omega = MO.omega0;
@@ -201,7 +191,7 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
 %                     max(0,Phi)*MO.kTorques_u;       % Phi>0
             end
             
-            % Apply higher-level speed input
+            % % % % Apply higher-level speed input
             MO.tau = MO.tau0 + MO.ks_tau*MO.s_in;
             MO.tau = max(MO.tau, 0.01); % Tau has to be > 0
             MO.tav = MO.tau_ratio*MO.tau;
@@ -213,7 +203,20 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
         end
         
         % %%%%%% % Derivative % %%%%%% %
-        function [Xdot] = Derivative(MO, ~, X)
+        function [Xdot] = Derivative(MO, ~, Xmod, X)
+			% odd - flexor
+            % even - extensor
+            
+            % % feed back to hip:
+            feedE1 = [0;0;0;0;...
+                -MO.k_hip_fb * MO.legSwitch *(Xmod(2) - Xmod(1));...
+                +MO.k_hip_fb * MO.legSwitch * (Xmod(2) - Xmod(1));];
+                
+            % % Maybe add synch to the hip joint angular speed?
+			% feedE2 = [0;0;0;0;...
+            %     -MO.k_d_hip_fb * MO.legSwitch *(Xmod(3) - Xmod(4));...
+            %     +MO.k_d_hip_fb * MO.legSwitch * (Xmod(3) - Xmod(4));];
+			
             % X = [u_i; v_i];
             u = X(1:2*MO.nPulses,:);
             v = X(2*MO.nPulses+1:end,:);
@@ -245,15 +248,15 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
                 MO = MO.Adaptation(Slope);
 %             end
                 
-                if MO.twoAnkleFlag
-                    % define 3 pairs of neurons, thus both ankles have a
-                    %   different signal.
-                    MO.jointSelM = abs(MO.jointSelM - diag([1,1,1,1,0,0]));
-                end
+                % switching CPG to the stance ankle:
+                MO.ankleSelect = bitxor(MO.ankleSelect,[true,true,false]);
                 
                 % % %reverse the hip torque after each ground impact
-                MO.OutM = [1,0; 0, -1]*MO.OutM;
+                MO.OutM(3,:) = MO.OutM(3,:)*(-1);
                 
+                % % reverse the calculation of the hip angle (use in
+                % feedback calc)
+                MO.legSwitch = (-1) * MO.legSwitch;
         end
         
         function PlotTorques(MO, tstep, mux)

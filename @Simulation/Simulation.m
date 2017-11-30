@@ -180,7 +180,7 @@ classdef Simulation < handle & matlab.mixin.Copyable
             sim.Mod.Torques=sim.Con.Output(t,X(sim.ConCo),X(sim.ModCo));
 
             Xt = [sim.Mod.Derivative(t,X(sim.ModCo));
-                  sim.Con.Derivative(t,X(sim.ConCo))];
+                  sim.Con.Derivative(t,X(sim.ModCo),X(sim.ConCo))];
         end
 
         function [value, isterminal, direction] = Events(sim, t, X) %#ok<INUSL>

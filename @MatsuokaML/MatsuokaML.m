@@ -3,10 +3,11 @@ classdef MatsuokaML
     %   Detailed explanation goes here
     
     properties
-        nNeurons = 4;
+        nNeurons = 6;
         NN_reg = [];        % regression neural network
         NN_classi = [];     % classification neural network (classes: 'n-osc' and 'osc' CPGs)
-        SVM = [];
+        
+        SVM = []; % not in use...
         normParams = [];
         
         doPlot = 0;
@@ -17,8 +18,11 @@ classdef MatsuokaML
         absTol = 1e-8;
         relTol = 1e-7;
         
+        % % % %
+        % not in use! (remove in future version)
         perLim = [];
         perLimOut = [];
+        % % % %
         
         Sim = [];
         Gen = [];
@@ -35,21 +39,7 @@ classdef MatsuokaML
     
     methods
         function obj = MatsuokaML()
-            
-%             % genome for 4Neurons Matsuoka:
-%             genome_file = 'MatsuokaGenome_4Neuron_general.mat';
-            
-%             % genome for 4Neurons Taga-like Matsuoka:
-            genome_file = 'MatsuokaGenome_4Neuron_tagaLike.mat';
-            
-%             % genome for 2Neurons Symmetric Matsuoka:
-%             genome_file = 'MatsuokaGenome_2Neuron_Symm.mat';
-            
-            % genome for 2Neurons General Matsuoka:
-%             genome_file = 'MatsuokaGenome_2Neuron_General.mat';
-            
-            % genome for TagaLike Matsuoka:
-%             genome_file = '';
+            genome_file = 'MatsuokaGenome.mat';
 
             load(genome_file);
             Keys(:,strcmp(Keys(1,:),'IC_matsuoka')) = []; %#ok<NODEF>
@@ -67,7 +57,7 @@ classdef MatsuokaML
             obj.Sim.Con.FBType = 0; % no slope feedback
             obj.Sim.Con.nPulses = N;
             obj.Sim.Con.stDim = 4*N;
-            obj.Sim.Con = obj.Sim.Con.SetOutMatrix([nAnkle,nHip]);
+            obj.Sim.Con = obj.Sim.Con.SetOutMatrix([nAnkle1,nAnkle2,nHip]);
             obj.Sim.Con.MinSat = [-maxAnkle,-maxHip];
             obj.Sim.Con.MaxSat = [ maxAnkle, maxHip];
             

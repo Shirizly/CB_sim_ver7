@@ -7,15 +7,9 @@ function [y, periods, signals, pos_work, neg_work, neuronActive, ...
     y = max(0, X(:, 1:obj.nNeurons));
     % Initialize output variables
     periods = zeros(obj.nNeurons/2,1);
-    if obj.nNeurons <= 4
-        signals = obj.Sim.Con.OutM*y';
-    else % for case with '6' neurons (two ankles)
-        OutM = [1,-1,0,0,0,0;
-            0,0,1,-1,0,0;
-            0,0,0,0,1,-1];
-        signals = OutM*y';
-    end
-    
+
+    signals = obj.Sim.Con.OutM*y';
+
     pos_work = zeros(obj.nNeurons/2,1);
     neg_work = zeros(obj.nNeurons/2,1);
     perError1 = zeros(obj.nNeurons/2,1);

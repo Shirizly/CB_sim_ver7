@@ -16,7 +16,8 @@ else
         switch lower(key)
             case {'npulses','nneurons','n_pulses','n_neurons'}
                 MO.nPulses = value; % Overall number of E/F neuron pairs
-                
+            case 'des_period' %desired period for Rescalling
+                MO.des_period = value;
             % neuron parameters
             case {'tau', 'tau_u'}
                 MO.tau = value;
@@ -93,20 +94,6 @@ else
                           0       ,0       ,0       ,0       ;
                           0       ,0       ,0       ,value(1);
                           0       ,0       ,value(2),0       ];
-            case '4neuron_symm_weights' % Neuron connection weights, symmetric 4neuron CPG
-                MO.win = 0;
-                MO.wex = zeros(2*MO.nPulses);
-                MO.wex = [0       ,value(1),value(2),value(3);
-                          value(1),0       ,value(4),value(5);
-                          value(2),value(4),0       ,value(6);
-                          value(3),value(5),value(6),0       ];
-            case '4neuron_taga_like'
-                MO.win = 0;
-                MO.wex = zeros(2*MO.nPulses);
-                MO.wex = [0       ,value(1),0       ,0;
-                          value(1),0       ,value(2),value(3);
-                          0       ,0       ,0       ,value(4);
-                          0       ,0       ,value(4),0       ];
                       
             % Controller Output
             case {'amp0', 'amp', 'c_i'} % Base neuron amplitude multiplier
@@ -126,18 +113,6 @@ else
             case 'amp_2n_dif_inputs' % different tonic inputs to both MN
                 MO.Amp0 = [0;0;value(1);value(2)];
                 MO.Amp = MO.Amp0;
-            case 'amp_same4each_joint'
-                MO.Amp0 = [value(1);value(1);value(2);value(2)];
-                MO.Amp = MO.Amp0;
-            case 'amp_4n_symm'
-                MO.Amp0 = [value;value;value;value];
-                MO.Amp = MO.Amp0;
-            % Feedback
-            case {'fbtype', 'feedback', 'fb'}
-                MO.FBType = value;
-                % Not yet implemented
-                
-            % Gains
             case {'ks_tau', 'speed_tau', 'tau_speed_gain', 'ks_\tau'}
                 MO.ks_tau = value;
             case {'ks_out', 'speed_out', 'torque_speed_gain', 'ks_c'}
@@ -146,10 +121,6 @@ else
                 MO.ks_out = [0;0;value;value];
             case {'ks_c_2n_general'} % when we have only the hip joint
                 MO.ks_out = [0;0;value(1);value(2)];
-            case {'ks_c_4n_symm'}
-                MO.ks_out = [value;value;value;value];
-            case {'ks_c_same4each_joint'}
-                MO.ks_out = [value(1);value(1);value(2);value(2)];
             case '6neuron_taga_like' % for case with 2 ankle torques (one for each foot)
                 MO.win = 0;
                 MO.wex = zeros(2*MO.nPulses);
@@ -173,7 +144,10 @@ else
                 MO.Amp = MO.Amp0;
             case {'ks_c_6n_symm'} % when we have only the hip joint
                 MO.ks_out = [value;value;value;value;value;value];
-            % Feedback        
+            % Feedback
+			case {'k_hip_fb'}
+                MO.k_hip_fb = value;
+            % Controller Output 			
             % Controller Output    
     
             
