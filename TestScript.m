@@ -44,4 +44,4 @@ whichGA_Case = '_NNclassi_and_rescale';
 trainingDataFile = 'MatsRandomRes_6N_TagaLike_TrainingSet_2.mat';
 
 MOGA_Matsuoka_Run(whichCPG,whichGA_Case,trainingDataFile,[])
-
+% MOGA_Matsuoka_Run(whichCPG,whichGA_Case,trainingDataFile,[])
