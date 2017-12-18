@@ -48,7 +48,7 @@ switch whichGA_Case
         use_NN = 0;
         GA.rescaleFcn = @rescaleFcn; 
         
-    case '_NN_classi_only'
+    case {'_NN_classi_only','_NN_classi_only_Feedback'}'
         use_NN = 'NN_classi';
     
     case '_NNs_and_rescale'
