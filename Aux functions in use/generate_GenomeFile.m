@@ -181,8 +181,8 @@ switch whichCase
         % Final genome with tau_r + beta (constant tau_u/tau_v ratio) 
         Keys = {'\tau_r', 'beta', 'amp_6n_symm',  '6neuron_taga_like_symm', 'ks_\tau',     'ks_c_6n_symm','k_hip_fb', 'IC_matsuoka';
                       1 ,      1,             1,                         4,        1 ,                 1 ,         1,            0 };
-        Range = {  0.02 ,    0.2,             0,                        mw,      -10 ,      -0.1*maxAnkle,        -5; % Min
-                   0.25 ,    2.5,      maxAnkle,                        Mw,       10 ,       0.1*maxAnkle,         5}; % Max
+        Range = {  0.02 ,    0.2,             0,                        mw,      -10 ,      -0.1*maxAnkle,        -20; % Min
+                   0.25 ,    2.5,      maxAnkle,                        Mw,       10 ,       0.1*maxAnkle,         20}; % Max
 
     otherwise
         error('invalid input');

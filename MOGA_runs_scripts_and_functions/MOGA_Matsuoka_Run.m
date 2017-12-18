@@ -40,7 +40,7 @@ load('MatsuokaGenome.mat','Keys','Range','N',...
 GA.genomeChevkFcn = [];%@genomeChevkFcn;
 
 switch whichGA_Case
-    case '_GA_only'
+    case {'_GA_only','_GA_only_Feedback'}
         % Use NN?
         use_NN = 0;
 

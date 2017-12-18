@@ -34,14 +34,25 @@ whichGA_Case = '_rescale_only';%'_GA_only';
 trainingDataFile = 'MatsRandomRes_6N_TagaLike_TrainingSet_2.mat';
 
 MOGA_Matsuoka_Run(whichCPG,whichGA_Case,trainingDataFile,[])
-%%
+%% GA+classifier+rescale (No Feedback)
 clear all; close all; clc;
-
+disp('begin...');
 generate_GenomeFile('6N_tagaLike_2Ank_torques_symm_with_rescale')
 
 whichCPG = '6N_TagaLike_symm';
 whichGA_Case = '_NNclassi_and_rescale';
 trainingDataFile = 'MatsRandomRes_6N_TagaLike_TrainingSet_2.mat';
 
-MOGA_Matsuoka_Run(whichCPG,whichGA_Case,trainingDataFile,[])
 % MOGA_Matsuoka_Run(whichCPG,whichGA_Case,trainingDataFile,[])
+
+%% GA only (With Feedback)
+clear all; close all; clc;
+generate_GenomeFile('6N_tagaLike_2Ank_torques_symm_feedback')
+
+whichCPG = '6N_TagaLike_symm';
+whichGA_Case = '_GA_only_Feedback';
+trainingDataFile = 'MatsRandomRes_6N_TagaLike_TrainingSet_2.mat';
+
+MOGA_Matsuoka_Run(whichCPG,whichGA_Case,trainingDataFile,[])
+
+
