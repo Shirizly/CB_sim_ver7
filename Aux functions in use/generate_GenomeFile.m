@@ -30,7 +30,8 @@ switch whichCase
         maxW = 5;
         minW = 0;
     case {'6N_tagaLike_2Ank_torques','6N_tagaLike_2Ank_torques_symm',...
-            '6N_tagaLike_2Ank_torques_symm_feedback','6N_tagaLike_2Ank_torques_symm_with_rescale'}
+            '6N_tagaLike_2Ank_torques_symm_feedback','6N_tagaLike_2Ank_torques_symm_with_rescale',...
+            '6N_general_2Ank_torques','6N_general_2Ank_torques_feedback'}
         nAnkle1 = 1; % Number of ankle1 torque pulses
         nAnkle2 = 1; % Number of ankle2 torques pulses
         nHip = 1;   % Number of hip torques
@@ -152,7 +153,7 @@ switch whichCase
         Range = {  0.02 ,    0.2,             0,                        mw,      -10 ,                 -0.1*maxAnkle; % Min
                    0.25 ,    2.5,      maxAnkle,                        Mw,       10 ,                  0.1*maxAnkle}; % Max
 
-   case '6N_tagaLike_2Ank_torques_symm_with_rescale'
+    case '6N_tagaLike_2Ank_torques_symm_with_rescale'
         Mamp = [maxAnkle*ones(1,2*nAnkle1),...
             maxAnkle*ones(1,2*nAnkle2),...
             maxHip*ones(1,2*nHip)];
@@ -176,14 +177,44 @@ switch whichCase
         
         mw = 0*ones(1,4);
         Mw = maxW*ones(1,4);
-        
-        % % Same structure as the previuos 6N CPG
-        % Final genome with tau_r + beta (constant tau_u/tau_v ratio) 
+         
         Keys = {'\tau_r', 'beta', 'amp_6n_symm',  '6neuron_taga_like_symm', 'ks_\tau',     'ks_c_6n_symm','k_hip_fb', 'IC_matsuoka';
                       1 ,      1,             1,                         4,        1 ,                 1 ,         1,            0 };
         Range = {  0.02 ,    0.2,             0,                        mw,      -10 ,      -0.1*maxAnkle,        -20; % Min
                    0.25 ,    2.5,      maxAnkle,                        Mw,       10 ,       0.1*maxAnkle,         20}; % Max
+    
+    case '6N_general_2Ank_torques'
 
+        Mamp = [maxAnkle*ones(1,2*nAnkle1),...
+            maxAnkle*ones(1,2*nAnkle2),...
+            maxHip*ones(1,2*nHip)];
+        mamp = 0*Mamp;
+        
+        mw = 0*ones(1,30);
+        Mw = maxW*ones(1,30);
+        
+        Keys = {'\tau_r', 'beta', 'amp_6n_symm',                 'weights', 'ks_\tau',     'ks_c_6n_symm', 'IC_matsuoka';
+                      1 ,      1,             1,                        30,        1 ,                 1 ,            0 };
+        Range = {  0.02 ,    0.2,             0,                        mw,      -10 ,      -0.1*maxAnkle; % Min
+                   0.25 ,    2.5,      maxAnkle,                        Mw,       10 ,       0.1*maxAnkle}; % Max
+               
+    case '6N_general_2Ank_torques_feedback'
+
+        Mamp = [maxAnkle*ones(1,2*nAnkle1),...
+            maxAnkle*ones(1,2*nAnkle2),...
+            maxHip*ones(1,2*nHip)];
+        mamp = 0*Mamp;
+        
+        mw = 0*ones(1,30);
+        Mw = maxW*ones(1,30);
+        
+        % % Same structure as the previuos 6N CPG
+        % Final genome with tau_r + beta (constant tau_u/tau_v ratio) 
+        Keys = {'\tau_r', 'beta', 'amp_6n_symm',                 'weights', 'ks_\tau',     'ks_c_6n_symm','k_hip_fb', 'IC_matsuoka';
+                      1 ,      1,             1,                        30,        1 ,                 1 ,         1,            0 };
+        Range = {  0.02 ,    0.2,             0,                        mw,      -10 ,      -0.1*maxAnkle,        -20; % Min
+                   0.25 ,    2.5,      maxAnkle,                        Mw,       10 ,       0.1*maxAnkle,         20}; % Max
+               
     otherwise
         error('invalid input');
 end

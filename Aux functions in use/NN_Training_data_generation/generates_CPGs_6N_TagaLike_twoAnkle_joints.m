@@ -4,18 +4,6 @@ close all; clc; clear all;
 %% Run a more general case of Taga-like CPG (six types of weights)
 generate_GenomeFile('6N_tagaLike_2Ank_torques')
 
-% Set up the genome
-load('MatsuokaGenome_4Neuron_tagaLike.mat','N');
-
-% define the class:
-MML = MatsuokaML();
-MML.perLim = [0.68 0.78];
-MML.perLimOut = MML.perLim + [-0.08 0.08]; % Desired period range
-MML.tStep = 0.05;
-MML.tEnd = 15;
-MML.nNeurons = 2*N;
-clear N
-
 header = sprintf('tau ratio is equal to %d \n',MML.Sim.Con.tau_ratio);
 header = [header,sprintf('data is for 6N TagaLike case with same C for each joint\n')];
 header = [header,sprintf('seq Order: \n')];
@@ -49,18 +37,6 @@ disp(header);
 % in this case there is more symmetry in the CPG
 generate_GenomeFile('6N_tagaLike_2Ank_torques_symm');
 
-% Set up the genome
-load('MatsuokaGenome_4Neuron_tagaLike.mat','N');
-
-% define the class:
-MML = MatsuokaML();
-MML.perLim = [0.68 0.78];
-MML.perLimOut = MML.perLim + [-0.08 0.08]; % Desired period range
-MML.tStep = 0.05;
-MML.tEnd = 15;
-MML.nNeurons = 2*N;
-clear N
-
 header = sprintf('tau ratio is equal to %d \n',MML.Sim.Con.tau_ratio);
 header = [header,sprintf('data is for 6N TagaLike case with same C for each joint\n')];
 header = [header,sprintf('seq Order: \n')];
@@ -85,7 +61,26 @@ header = [header,sprintf('"k_c" in range ( %.2f , %.2f ) \n',...
     MML.Gen.Range(1,9),MML.Gen.Range(2,9))];
 
 disp(header);
+
+%% %% Run General 6Neuron Matsuoka CPG
+generate_GenomeFile('6N_general_2Ank_torques');
+
 %% Train data: get All osc and n-osc (train data for classifier)
+
+% Set up the genome
+load('MatsuokaGenome.mat','N');
+
+% define the class:
+MML = MatsuokaML();
+% MML.perLim = [0.68 0.78];
+% MML.perLimOut = MML.perLim + [-0.08 0.08]; % Desired period range
+MML.perLim = [1.3 1.5];
+MML.perLimOut = MML.perLim + [-0.08 0.08]; % Desired period range
+MML.tStep = 0.05;
+MML.tEnd = 15;
+MML.nNeurons = 2*N;
+clear N
+
 N = 1000; % the number of samples
 CPGs_num = 0;
 round_count = 0;
@@ -128,8 +123,10 @@ end
 
 disp('sim end...');
 
-save('MatsRandomRes_6N_TagaLike_TrainingSet_2.mat',...
-    'results','header');
+% save('MatsRandomRes_6N_TagaLike_TrainingSet_2.mat',...
+%     'results','header');
+save('MatsRandomRes_6N_general_TrainingSet.mat',...
+    'results');
 
 clear N
 

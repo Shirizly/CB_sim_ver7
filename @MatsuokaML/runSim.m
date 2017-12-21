@@ -89,7 +89,7 @@ function [out, sim, signal] = runSim(obj, sequence)
     signal.signal = signals;
     
     function Xt = derivative(~, X)
-        Xt = sim.Con.Derivative(0, X);
+        Xt = sim.Con.Derivative(0,[0;0], X);
 %         Xt = zeros(size(X));
 %         
 %         y = max(X(1:2:end),0);

@@ -3,15 +3,17 @@
 %%
 clear all; close all; clc;
 
-% CPG case study name:
-whichCPG = '6N_TagaLike_symm';
 
-% training data file name:
-trainingDataFile = 'MatsRandomRes_6N_TagaLike_TrainingSet_2.mat';
+% % % % % Tagalike CPG case study:
+% whichCPG = '6N_TagaLike_symm'; % CPG case study name
+% trainingDataFile = 'MatsRandomRes_6N_TagaLike_TrainingSet_2.mat'; % training data file name
+% generate_GenomeFile('6N_tagaLike_2Ank_torques_symm_feedback'); %(enable CPG feedback)
+% % generate_GenomeFile('6N_tagaLike_2Ank_torques_symm');          %(disable CPG feedback)
 
-
-generate_GenomeFile('6N_tagaLike_2Ank_torques_symm_feedback'); %(enable CPG feedback)
-% generate_GenomeFile('6N_tagaLike_2Ank_torques_symm');          %(disable CPG feedback)
+% % % % % general Matsuoka CPG case study:
+whichCPG = '6N_general'; % CPG case study name
+trainingDataFile = 'MatsRandomRes_6N_general_TrainingSet.mat'; % training data file name
+generate_GenomeFile('6N_general_2Ank_torques');
 
 %% GA only (No Feedback)
 whichGA_Case = '_GA_only';
@@ -30,7 +32,7 @@ whichGA_Case = '_NNclassi_and_rescale';
 whichGA_Case = '_GA_only_Feedback';
 
 %%  GA + NN (With Feedback)
-whichGA_Case = '_NNclassi_Feedback';
+whichGA_Case = '_NN_classi_only_Feedback';
 
 %% Begin Simulations:
 for i=1:2
