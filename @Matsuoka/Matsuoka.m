@@ -222,7 +222,8 @@ classdef Matsuoka < handle & matlab.mixin.Copyable
             v = X(2*MO.nPulses+1:end,:);
             y = max(u,0);
             
-            udot = 1/MO.tau*(-u - MO.beta*v + MO.Amp - MO.W*y);
+            % udot = 1/MO.tau*(-u - MO.beta*v + MO.Amp - MO.W*y);
+            udot = 1/MO.tau*(-u - MO.beta*v + MO.Amp - MO.W*y + feedE1);
             vdot = 1/MO.tav*(-v+y);
             
             Xdot = [udot;
